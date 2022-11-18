@@ -15,7 +15,7 @@ export const options: DataSourceOptions = {
   synchronize: process.env.NODE_ENV !== 'production',
   logging: process.env.NODE_ENV !== 'production',
   entities: ['dist/**/*.entity.{js,ts}'],
-  migrations: ['dist/migration/*{.ts,.js}'],
+  migrations: ['dist/migrations/*{.ts,.js}'],
   migrationsRun: true,
 };
 

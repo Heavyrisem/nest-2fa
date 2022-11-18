@@ -35,17 +35,17 @@ $ yarn install
 ## Running the app
 
 ```bash
-# development
-$ yarn run start
+# build app
+$ yarn build
 
-# watch mode
-$ yarn run start:dev
-
-# production mode
-$ yarn run start:prod
-
-# production mode with docker-compose
+# start database
 $ docker-compose up -d
+
+# migration db schema
+$ yarn typeorm:run-migrations
+
+# start app
+$ yarn run start:prod
 ```
 
 ## Usage
