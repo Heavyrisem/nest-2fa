@@ -1,20 +1,22 @@
-const path = require('path');
-
 module.exports = {
   parser: '@typescript-eslint/parser',
-  parserOptions: {
-    sourceType: 'module',
-    project: './tsconfig.json',
-    tsconfigRootDir: __dirname,
-  },
+  // parserOptions: {
+  //   sourceType: 'module',
+  //   project: './tsconfig.json',
+  //   tsconfigRootDir: __dirname,
+  // },
   plugins: ['@typescript-eslint/eslint-plugin'],
-  extends: ['plugin:@typescript-eslint/recommended', 'plugin:prettier/recommended', 'plugin:import/recommended'],
+  extends: [
+    'plugin:@typescript-eslint/recommended',
+    'plugin:prettier/recommended',
+    'plugin:import/recommended',
+  ],
   root: true,
   env: {
     node: true,
     jest: true,
   },
-  ignorePatterns: ['.eslintrc.js'],
+  // ignorePatterns: ['.eslintrc.js'],
   rules: {
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
@@ -23,30 +25,31 @@ module.exports = {
     'import/order': [
       'error',
       {
-        groups: ['builtin', 'external', ['parent', 'sibling'], 'index'],
+        groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index', 'unknown'],
+        pathGroupsExcludedImportTypes: [],
         pathGroups: [
           {
-            pattern: '~**',
+            pattern: '@nestjs/**',
             group: 'external',
+            position: 'after',
+          },
+          {
+            pattern: '~*/**',
+            group: 'internal',
+            position: 'before',
           },
         ],
+        alphabetize: {
+          order: 'asc',
+          caseInsensitive: true,
+        },
         'newlines-between': 'always',
       },
     ],
   },
   settings: {
-    "import/resolver": {
-      // "alias": {
-      // map: [
-      //   ["@shared", path.resolve(__dirname, "../shared")]
-      // ],
-      // "extensions": [".js", ".jsx", ".ts", ".tsx", ".entity"]
-      // },
-      "node": {
-        "extensions": [".js", ".jsx", ".ts", ".tsx", ".entity"],
-        "moduleDirectory": ["node_modules", "@types"]
-      },
-      "typescript": {}  // this loads <rootdir>/tsconfig.json to eslint
-    }
-  }
-}
+    'import/resolver': {
+      typescript: {}, // this loads <rootdir>/tsconfig.json to eslint
+    },
+  },
+};
