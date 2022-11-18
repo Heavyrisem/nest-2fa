@@ -1,8 +1,10 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
 import { ConfigurationModule } from '../config/config.module';
+
 import { options } from './typeorm.datasource';
 
 @Module({

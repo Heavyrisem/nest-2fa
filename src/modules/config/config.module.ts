@@ -1,6 +1,7 @@
+import * as Joi from 'joi';
+
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import * as Joi from 'joi';
 
 @Module({
   imports: [
@@ -15,6 +16,8 @@ import * as Joi from 'joi';
         DB_USER: Joi.string().required(),
         DB_PASSWORD: Joi.string().required(),
         DB_NAME: Joi.string().required(),
+        JWT_SECRET: Joi.string().required(),
+        TWO_FACTOR_PERIOD: Joi.number().default(30),
       }),
     }),
   ],
