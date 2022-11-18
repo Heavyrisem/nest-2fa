@@ -24,11 +24,7 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) BoilerPlate Repository
-
-- Docker-Compose
-- Mysql
-- Winston Logger
+[Nest](https://github.com/nestjs/nest) 2FA Example
 
 ## Installation
 
@@ -52,19 +48,51 @@ $ yarn run start:prod
 $ docker-compose up -d
 ```
 
-## Test
+## Usage
 
-```bash
-# unit tests
-$ yarn run test
+#### Step 1
 
-# e2e tests
-$ yarn run test:e2e
+계정 등록을 위해 서버로 계정 등록 요청을 보냅니다 <br>
+`POST http://localhost:3000/user/register`
 
-# test coverage
-$ yarn run test:cov
+```
+{
+  "email": "test@example.com",
+  "name": "test",
+  "password": "pw",
+}
 ```
 
-### Featured
+정상적으로 등록이 된 경우, 2fa private Key와 등록이 가능한 2fa url이 반환됩니다.
 
-- Swagger
+```
+{
+  "result": {
+    "twoFactorKey": "NNGHARSHOZGVA5CQJZBHMUCUJBGWWZRUKR3DO6BVKBTHQT2KOJ3Q",
+    "twoFactorUrl": "otpauth://totp/Nest-2FA 테스트?secret=NNGHARSHOZGVA5CQJZBHMUCUJBGWWZRUKR3DO6BVKBTHQT2KOJ3Q&issuer=NEST-2FA&algorithm=SHA1&digits=6&period=30"
+  }
+}
+```
+
+twoFactorKey를 바로 OTP클라이언트에 등록하거나, twoFactorUrl을 QR 형태로 변환하여 OTP클라이언트에 등록 가능합니다.
+
+#### Step 2
+
+OTP 클라이언트에 표시된 OTP CODE를 앞서 등록한 계정 정보와 함께 전송합니다. <br>
+`POST http://localhost:3000/user/login `
+
+```
+{
+  "email": "test@example.com",
+  "password": "pw",
+  "twoFactorCode": "035579" // YOUR 2FA CODE
+}
+```
+
+정상적으로 인증이 완료되면 jwt 토큰 정보가 반환됩니다.
+
+```
+{
+  "token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwibmFtZSI6InRlc3QiLCJpYXQiOjE2Njg3NTUyMjl9.a3kfquIFIB5BQEsGQn1IRbOTud7LyTkn5VkBjkF0R25Q47x_mK25IZIIoYM7gpJkaInNCA8To_FgeO_c-A3vKmVOrWzBCS7dAYVKxp_nrFxXGBAqeTlnJlD9ZUzNC8grEi4XGwvvIv2uTC4F2L3hy6Q_kRLvXtCFgfSDAGQmXOKXtG46ZFmtkHuxksmtVpchVjFP8zIUTWj8cefx2WNkrdalRdR3UKbFNIjdTenPobEFsgwIOwEefQ1dUP-ztMPdHdQu8lA7YkNbn4XTfrEIOeDmHDwMR6_bY6igCrJDcKxbOrGH6ruPh4mtERdqEeCXCoZZyFpP3jipvzQqYrHm7w"
+}
+```
