@@ -6,6 +6,7 @@ import { default as totp } from 'totp-generator';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { CONFIG_OPTIONS } from './totp.constants';
+import { TotpModuleOptions } from './totp.interface';
 
 @Injectable()
 export class TotpService {

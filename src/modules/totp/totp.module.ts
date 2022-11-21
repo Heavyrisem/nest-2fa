@@ -1,6 +1,7 @@
 import { DynamicModule, Module } from '@nestjs/common';
 
 import { CONFIG_OPTIONS } from './totp.constants';
+import { TotpModuleOptions } from './totp.interface';
 import { TotpService } from './totp.service';
 
 @Module({})
