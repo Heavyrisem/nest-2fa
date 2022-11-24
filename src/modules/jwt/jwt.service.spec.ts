@@ -1,5 +1,6 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { JsonWebTokenError, JwtPayload } from 'jsonwebtoken';
+
+import { Test, TestingModule } from '@nestjs/testing';
 
 import { CONFIG_OPTIONS } from './jwt.constants';
 import { JwtModuleOptions } from './jwt.interface';

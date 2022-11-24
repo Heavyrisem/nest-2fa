@@ -12,6 +12,7 @@ import { JwtMiddleware } from '~modules/jwt/jwt.middleware';
 import { JwtModule } from '~modules/jwt/jwt.module';
 import { LoggerMiddleware } from '~modules/logging/logger.middleware';
 
+import { TestModule } from './test/test.module';
 import { UserModule } from './user/user.module';
 
 @Module({
@@ -19,6 +20,7 @@ import { UserModule } from './user/user.module';
     ConfigurationModule,
     JwtModule.ForRoot({ privateKey: Buffer.from(process.env.JWT_SECRET, 'base64').toString() }),
     UserModule,
+    TestModule,
   ],
   controllers: [],
   providers: [
