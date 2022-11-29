@@ -1,6 +1,8 @@
 import { randomBytes } from 'crypto';
 
+import { Response } from 'express';
 import { encode } from 'hi-base32';
+import QRCode from 'qrcode';
 import { default as totp } from 'totp-generator';
 
 import { Inject, Injectable } from '@nestjs/common';
@@ -19,7 +21,7 @@ export class TotpService {
   }
 
   getURL(key: string, label = 'Nest-2FA 테스트', issuer = 'NEST-2FA') {
-    return `otpauth://totp/${label}?secret=${key}&issuer=${issuer}&algorithm=SHA1&digits=${this.options.digits}&period=${this.options.period}`;
+    return `otpauth://totp/${label}:?secret=${key}&issuer=${issuer}&algorithm=SHA1&digits=${this.options.digits}&period=${this.options.period}`;
   }
 
   private generateSecretASCII(length = 32, symbols = false) {
@@ -39,5 +41,9 @@ export class TotpService {
   generateSecret() {
     const key = this.generateSecretASCII();
     return encode(key).split('=').join('');
+  }
+
+  generateQrCode(stream: Response, url: string) {
+    return QRCode.toFileStream(stream, url);
   }
 }

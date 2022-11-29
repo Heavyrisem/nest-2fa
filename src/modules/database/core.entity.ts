@@ -1,4 +1,4 @@
-import { CreateDateColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { CreateDateColumn, DeleteDateColumn, PrimaryGeneratedColumn } from 'typeorm';
 
 export class CoreEntity {
   @PrimaryGeneratedColumn()
@@ -6,4 +6,7 @@ export class CoreEntity {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @DeleteDateColumn()
+  destroyedAt?: Date;
 }

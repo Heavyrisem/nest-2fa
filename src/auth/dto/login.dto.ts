@@ -1,6 +1,6 @@
 import { IsNumberString, IsString, Length } from 'class-validator';
 
-export class LoginUserDto {
+export class LoginDto {
   constructor(email: string, password: string) {
     this.email = email;
     this.password = password;
@@ -11,8 +11,4 @@ export class LoginUserDto {
 
   @IsString()
   password: string;
-
-  @IsNumberString()
-  @Length(6, 6)
-  twoFactorCode: string;
 }

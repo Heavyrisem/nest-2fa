@@ -1,6 +1,6 @@
 import { hash, compare } from 'bcrypt';
 import { Exclude } from 'class-transformer';
-import { IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { BeforeInsert, Column, Entity } from 'typeorm';
 
 import { CoreEntity } from '~src/modules/database/core.entity';
@@ -21,8 +21,16 @@ export class User extends CoreEntity {
   password: string;
 
   @Column()
+  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  two_factor: string;
+  twoFactorSecret?: string;
+
+  @Column()
+  @IsOptional()
+  @IsNotEmpty()
+  @IsString()
+  refreshToken?: string;
 
   @BeforeInsert()
   async hashPassword(): Promise<void> {
