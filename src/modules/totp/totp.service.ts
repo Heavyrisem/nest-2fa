@@ -15,9 +15,11 @@ export class TotpService {
   constructor(@Inject(CONFIG_OPTIONS) private readonly options: TotpModuleOptions) {}
 
   getCode(key: string) {
-    return totp(key, {
+    const code = totp(key, {
       ...this.options,
     });
+    // console.log(`Generated2FAcode ${code}`);
+    return code;
   }
 
   getURL(key: string, label = 'Nest-2FA 테스트', issuer = 'NEST-2FA') {

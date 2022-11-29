@@ -16,6 +16,7 @@ import { LoginDto } from '~src/auth/dto/login.dto';
 import { User } from '~src/user/user.entity';
 
 import { TwoFactorLoginDto } from './dto/2fa-login.dto';
+import { LoggerService } from '~modules/logging/logger.service';
 
 @Injectable()
 export class AuthService {
@@ -24,6 +25,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly totpService: TotpService,
     private readonly configService: ConfigService,
+    private readonly loggerService: LoggerService,
   ) {}
 
   async login({
@@ -70,6 +72,7 @@ export class AuthService {
     if (!user.twoFactorSecret) throw new NotFoundException('OTP is not registered');
 
     const serverTwoFactorCode = this.totpService.getCode(user.twoFactorSecret);
+    this.loggerService.debug(`GeneratedCode ${serverTwoFactorCode}`);
     if (serverTwoFactorCode !== userTwoFactorCode)
       throw new UnauthorizedException('2FA authentication failed');
 
@@ -92,9 +95,15 @@ export class AuthService {
   }
 
   generateAccessToken(payload: JwtAuthPayload) {
-    return this.jwtService.sign(payload, { secret: this.configService.get('JWT_ACCESS_SECRET') });
+    return this.jwtService.sign(payload, {
+      secret: this.configService.get('JWT_ACCESS_SECRET'),
+      expiresIn: this.configService.get('JWT_ACCESS_EXPIRES'),
+    });
   }
   generateRefreshToken(payload: JwtAuthPayload) {
-    return this.jwtService.sign(payload, { secret: this.configService.get('JWT_REFRESH_SECRET') });
+    return this.jwtService.sign(payload, {
+      secret: this.configService.get('JWT_REFRESH_SECRET'),
+      expiresIn: this.configService.get('JWT_REFRESH_EXPIRES'),
+    });
   }
 }

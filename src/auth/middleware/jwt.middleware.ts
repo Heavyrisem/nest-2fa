@@ -13,9 +13,13 @@ export class JwtMiddleware implements NestMiddleware {
 
   async use(req: Request, res: Response, next: NextFunction) {
     try {
-      if ('authorization' in req.headers) {
-        const [_, token] = req.headers.authorization.split(' ');
-        const decoded = this.jwtService.decode(token) as Partial<JwtAuthPayload>;
+      const accessToken = req.headers.authorization?.replace('Bearer ', '') || null;
+      const refreshToken = req.cookies['refreshToken']?.replace('Bearer ', '') || null;
+      console.log('accessToken', accessToken);
+      console.log('refreshToken', refreshToken);
+
+      if (accessToken && refreshToken) {
+        const decoded = this.jwtService.decode(accessToken) as Partial<JwtAuthPayload>;
 
         // TODO: access, refresh token 재발급 로직
         if (typeof decoded === 'object' && decoded['id']) {

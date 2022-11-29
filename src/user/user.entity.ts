@@ -20,16 +20,16 @@ export class User extends CoreEntity {
   @Column()
   password: string;
 
-  @Column()
   @IsOptional()
   @IsNotEmpty()
   @IsString()
+  @Column({ nullable: true })
   twoFactorSecret?: string;
 
-  @Column()
   @IsOptional()
   @IsNotEmpty()
   @IsString()
+  @Column({ nullable: true })
   refreshToken?: string;
 
   @BeforeInsert()

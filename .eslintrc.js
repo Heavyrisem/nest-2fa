@@ -44,6 +44,7 @@ module.exports = {
           caseInsensitive: true,
         },
         'newlines-between': 'always',
+        "prettier/prettier": ["error", { "endOfLine": "auto" }]
       },
     ],
   },

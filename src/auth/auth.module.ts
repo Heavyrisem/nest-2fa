@@ -3,6 +3,7 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { DatabaseModule } from '~modules/database/database.module';
+import { LoggerService } from '~modules/logging/logger.service';
 import { TotpModule } from '~modules/totp/totp.module';
 import { User } from '~src/user/user.entity';
 
@@ -17,7 +18,7 @@ import { AuthService } from './auth.service';
     JwtModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, LoggerService],
   exports: [AuthService],
 })
 export class AuthModule {}

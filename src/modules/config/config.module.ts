@@ -18,8 +18,8 @@ import { ConfigModule } from '@nestjs/config';
         DB_NAME: Joi.string().required(),
         JWT_ACCESS_SECRET: Joi.string().required(),
         JWT_REFRESH_SECRET: Joi.string().required(),
-        ACCESS_AGE: Joi.number().default(1000 * 60), // 1min
-        REFRESH_AGE: Joi.number().default(1000 * 60 * 2), // 2min
+        JWT_ACCESS_EXPIRES: Joi.number().default(1000 * 60), // 1min
+        JWT_REFRESH_EXPIRES: Joi.number().default(1000 * 60 * 2), // 2min
         TWO_FACTOR_PERIOD: Joi.number().default(30),
       }),
     }),
