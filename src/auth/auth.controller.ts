@@ -1,6 +1,16 @@
-import { Response } from 'express';
+import { Request, Response } from 'express';
 
-import { Body, Controller, Get, Header, Post, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Header,
+  Post,
+  Req,
+  Res,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { TotpService } from '~modules/totp/totp.service';
@@ -11,6 +21,9 @@ import { AuthService } from './auth.service';
 import { GetUser } from './decorator/user.decorator';
 import { TwoFactorLoginDto } from './dto/2fa-login.dto';
 import { JwtAuthGuard } from './guard/jwt-auth.guard';
+import { JwtService } from '@nestjs/jwt';
+import { JwtAuthPayload } from './auth.interface';
+import { LoggerService } from '~modules/logging/logger.service';
 
 @Controller('/auth')
 export class AuthController {
@@ -18,6 +31,8 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly totpService: TotpService,
     private readonly configService: ConfigService,
+    private readonly jwtService: JwtService,
+    private readonly loggerService: LoggerService,
   ) {}
 
   @Get('/2fa')
@@ -32,10 +47,9 @@ export class AuthController {
   @Post('/login')
   async login(@Res() res: Response, @Body() loginDto: LoginDto) {
     const { accessToken, refreshToken } = await this.authService.login(loginDto);
-
     res.cookie('refreshToken', `Bearer ${refreshToken}`, {
       httpOnly: true,
-      maxAge: this.configService.get('REFRESH_AGE'),
+      maxAge: this.configService.get('JWT_COOKIE_EXPIRES'),
     });
 
     res.send({ accessToken }); // TODO: API 응답 형식 통일
@@ -55,9 +69,42 @@ export class AuthController {
 
     res.cookie('refreshToken', `Bearer ${refreshToken}`, {
       httpOnly: true,
-      maxAge: this.configService.get('REFRESH_AGE'),
+      maxAge: this.configService.get('JWT_COOKIE_EXPIRES'),
     });
 
     res.send({ accessToken }); // TODO: API 응답 형식 통일
+  }
+
+  @Post('/re-issue')
+  async reIssueToken(@Req() req: Request, @Res() res: Response, @GetUser() user: User) {
+    const accessToken = req.headers.authorization?.replace('Bearer ', '') || null;
+    const refreshToken = req.cookies['refreshToken']?.replace('Bearer ', '') || null;
+    if (!accessToken || !refreshToken) throw new UnauthorizedException();
+
+    const isAccessValid = this.authService.verifyAccessToken(accessToken);
+    const isRefreshValid = this.authService.verifyRefreshToken(refreshToken);
+    if (!isAccessValid && !isRefreshValid) throw new UnauthorizedException();
+
+    const { id, twoFactorAuthenticated } = this.jwtService.decode(refreshToken) as JwtAuthPayload;
+    const newAccessToken = this.authService.generateAccessToken({ id, twoFactorAuthenticated });
+
+    if (isAccessValid && !isRefreshValid && refreshToken === user.refreshToken) {
+      this.loggerService.debug('Re-Create refreshToken');
+      const { id, twoFactorAuthenticated } = this.jwtService.decode(accessToken) as JwtAuthPayload;
+      const newRefreshToken = await this.authService.generateRefreshToken({
+        id,
+        twoFactorAuthenticated,
+      });
+
+      // FIXME: 반복됨
+      res.cookie('refreshToken', `Bearer ${newRefreshToken}`, {
+        httpOnly: true,
+        maxAge: this.configService.get('JWT_COOKIE_EXPIRES'),
+      });
+      res.send({ accessToken });
+      return;
+    }
+
+    res.send({ accessToken: newAccessToken });
   }
 }

@@ -1,4 +1,5 @@
-import { Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
+import { Response } from 'express';
 
 import { GetUser } from '~src/auth/decorator/user.decorator';
 import { TwoFactorAuthGuard } from '~src/auth/guard/2fa-auth.guard';
@@ -14,14 +15,14 @@ export class TestController {
   @Post('/')
   @UseGuards(JwtAuthGuard)
   getHello(@GetUser() user: User) {
-    console.log(JSON.stringify(user));
+    console.log(user);
     return this.testService.getHello();
   }
 
   @Post('/2fa')
   @UseGuards(TwoFactorAuthGuard)
   twoFactorTest(@GetUser() user: User) {
-    console.log(JSON.stringify(user));
+    console.log(user);
     return this.testService.getHello();
   }
 }

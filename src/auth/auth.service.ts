@@ -45,8 +45,7 @@ export class AuthService {
     };
 
     const accessToken = this.generateAccessToken(payload);
-    const refreshToken = this.generateRefreshToken(payload);
-    await this.userRepository.update({ id: user.id }, { refreshToken });
+    const refreshToken = await this.generateRefreshToken(payload);
 
     return { accessToken, refreshToken };
   }
@@ -79,8 +78,7 @@ export class AuthService {
     const payload: JwtAuthPayload = { id: user.id, twoFactorAuthenticated: true };
 
     const accessToken = this.generateAccessToken(payload);
-    const refreshToken = this.generateRefreshToken(payload);
-    await this.userRepository.update({ id: user.id }, { refreshToken });
+    const refreshToken = await this.generateRefreshToken(payload);
 
     return { accessToken, refreshToken };
   }
@@ -93,17 +91,28 @@ export class AuthService {
       return false;
     }
   }
+  verifyRefreshToken(token: string) {
+    try {
+      this.jwtService.verify(token, { secret: this.configService.get('JWT_REFRESH_SECRET') });
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
 
   generateAccessToken(payload: JwtAuthPayload) {
     return this.jwtService.sign(payload, {
       secret: this.configService.get('JWT_ACCESS_SECRET'),
-      expiresIn: this.configService.get('JWT_ACCESS_EXPIRES'),
+      expiresIn: this.configService.get('JWT_ACCESS_EXPIRES') / 1000,
     });
   }
-  generateRefreshToken(payload: JwtAuthPayload) {
-    return this.jwtService.sign(payload, {
+
+  async generateRefreshToken(payload: JwtAuthPayload) {
+    const refreshToken = this.jwtService.sign(payload, {
       secret: this.configService.get('JWT_REFRESH_SECRET'),
-      expiresIn: this.configService.get('JWT_REFRESH_EXPIRES'),
+      expiresIn: this.configService.get('JWT_REFRESH_EXPIRES') / 1000,
     });
+    await this.userRepository.update({ id: payload.id }, { refreshToken });
+    return refreshToken;
   }
 }
