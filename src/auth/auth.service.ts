@@ -17,6 +17,7 @@ import { User } from '~src/user/user.entity';
 
 import { TwoFactorLoginDto } from './dto/2fa-login.dto';
 import { LoggerService } from '~modules/logging/logger.service';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -114,5 +115,12 @@ export class AuthService {
     });
     await this.userRepository.update({ id: payload.id }, { refreshToken });
     return refreshToken;
+  }
+
+  setRefreshCookie(res: Response, refreshToken: string) {
+    res.cookie('refreshToken', `Bearer ${refreshToken}`, {
+      httpOnly: true,
+      maxAge: this.configService.get('JWT_COOKIE_EXPIRES'),
+    });
   }
 }

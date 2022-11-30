@@ -47,10 +47,7 @@ export class AuthController {
   @Post('/login')
   async login(@Res() res: Response, @Body() loginDto: LoginDto) {
     const { accessToken, refreshToken } = await this.authService.login(loginDto);
-    res.cookie('refreshToken', `Bearer ${refreshToken}`, {
-      httpOnly: true,
-      maxAge: this.configService.get('JWT_COOKIE_EXPIRES'),
-    });
+    this.authService.setRefreshCookie(res, refreshToken);
 
     res.send({ accessToken }); // TODO: API 응답 형식 통일
   }
@@ -67,11 +64,7 @@ export class AuthController {
       twoFactorLoginDto,
     );
 
-    res.cookie('refreshToken', `Bearer ${refreshToken}`, {
-      httpOnly: true,
-      maxAge: this.configService.get('JWT_COOKIE_EXPIRES'),
-    });
-
+    this.authService.setRefreshCookie(res, refreshToken);
     res.send({ accessToken }); // TODO: API 응답 형식 통일
   }
 
@@ -88,7 +81,7 @@ export class AuthController {
     const { id, twoFactorAuthenticated } = this.jwtService.decode(refreshToken) as JwtAuthPayload;
     const newAccessToken = this.authService.generateAccessToken({ id, twoFactorAuthenticated });
 
-    if (isAccessValid && !isRefreshValid && refreshToken === user.refreshToken) {
+    if (isAccessValid && !isRefreshValid && refreshToken === user?.refreshToken) {
       this.loggerService.debug('Re-Create refreshToken');
       const { id, twoFactorAuthenticated } = this.jwtService.decode(accessToken) as JwtAuthPayload;
       const newRefreshToken = await this.authService.generateRefreshToken({
@@ -96,11 +89,7 @@ export class AuthController {
         twoFactorAuthenticated,
       });
 
-      // FIXME: 반복됨
-      res.cookie('refreshToken', `Bearer ${newRefreshToken}`, {
-        httpOnly: true,
-        maxAge: this.configService.get('JWT_COOKIE_EXPIRES'),
-      });
+      this.authService.setRefreshCookie(res, newRefreshToken);
       res.send({ accessToken });
       return;
     }
