@@ -15,9 +15,10 @@ import { AuthModule } from './auth/auth.module';
 import { JwtMiddleware } from './auth/middleware/jwt.middleware';
 import { TestModule } from './test/test.module';
 import { UserModule } from './user/user.module';
+import { RoleModule } from './role/role.module';
 
 @Module({
-  imports: [ConfigurationModule, UserModule, TestModule, AuthModule, JwtModule],
+  imports: [ConfigurationModule, UserModule, TestModule, AuthModule, JwtModule, RoleModule],
   controllers: [],
   providers: [
     {

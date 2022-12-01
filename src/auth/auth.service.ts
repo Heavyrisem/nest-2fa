@@ -39,7 +39,7 @@ export class AuthService {
 
     const payload: JwtAuthPayload = {
       id: user.id,
-      twoFactorAuthenticated: false,
+      twoFactorAuthenticated: true,
       //   email: user.email,
       //   name: user.name,
       //   role: user.role.map((r) => ({ name: r.name, description: r.description })),
