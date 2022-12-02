@@ -31,13 +31,22 @@ export class RoleModule implements OnModuleInit {
     };
 
     this.logger.log('Creating role groups');
-    const test = await this.roleService.saveRoleGroup({
+    await this.roleService.saveRoleGroup({
       name: 'SuperAdmin',
       description: '슈퍼 어드민',
       roles: [roles.ManageUser, roles.TestRole],
     });
+    await this.roleService.saveRoleGroup({
+      name: 'Admin',
+      description: '어드민',
+      roles: [roles.TestRole],
+    });
+    await this.roleService.saveRoleGroup({
+      name: 'User',
+      description: '기본 유저',
+      roles: [],
+    });
 
-    console.log(test);
     this.logger.log('Initialize Role data Completed');
   }
 }

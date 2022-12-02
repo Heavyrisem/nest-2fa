@@ -1,9 +1,10 @@
 import { hash, compare } from 'bcrypt';
 import { Exclude } from 'class-transformer';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { BeforeInsert, Column, Entity } from 'typeorm';
+import { IsInstance, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { BeforeInsert, Column, Entity, OneToOne } from 'typeorm';
 
 import { CoreEntity } from '~src/modules/database/core.entity';
+import { RoleGroup } from '~src/role/entity/role-group.entity';
 
 @Entity()
 export class User extends CoreEntity {
@@ -31,6 +32,11 @@ export class User extends CoreEntity {
   @IsString()
   @Column({ nullable: true })
   refreshToken?: string;
+
+  @IsOptional()
+  @IsInstance(RoleGroup)
+  @OneToOne(() => RoleGroup, (roleGroup) => roleGroup.id)
+  roleGroup?: RoleGroup;
 
   @BeforeInsert()
   async hashPassword(): Promise<void> {
