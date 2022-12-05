@@ -13,7 +13,7 @@ export class RoleGroup extends CoreEntity {
   @Column()
   description: string;
 
-  @ManyToMany(() => Role, (role) => role.id)
+  @ManyToMany(() => Role, (role) => role.id, { eager: true })
   @JoinTable({ name: 'role_group_join' })
   roles: Role[];
 }

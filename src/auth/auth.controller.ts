@@ -68,7 +68,7 @@ export class AuthController {
     res.send({ accessToken }); // TODO: API 응답 형식 통일
   }
 
-  @Post('/issue')
+  @Post('/re-issue')
   async reIssueToken(@Req() req: Request, @Res() res: Response, @GetUser() user: User) {
     const accessToken = req.headers.authorization?.replace('Bearer ', '') || null;
     const refreshToken = req.cookies['refreshToken']?.replace('Bearer ', '') || null;

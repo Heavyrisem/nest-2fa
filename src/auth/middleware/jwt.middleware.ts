@@ -14,16 +14,14 @@ export class JwtMiddleware implements NestMiddleware {
   async use(req: Request, res: Response, next: NextFunction) {
     try {
       const accessToken = req.headers.authorization?.replace('Bearer ', '') || null;
-      const refreshToken = req.cookies['refreshToken']?.replace('Bearer ', '') || null;
-      console.log('accessToken', accessToken);
-      console.log('refreshToken', refreshToken);
 
-      if (accessToken && refreshToken) {
+      if (accessToken) {
         const accessPayload = this.jwtService.decode(accessToken) as JwtAuthPayload;
 
-        // TODO: access, refresh token 재발급 로직
         if (typeof accessPayload === 'object' && accessPayload['id']) {
-          const user = await this.userService.findById(accessPayload.id);
+          const user = await this.userService.findById(accessPayload.id, {
+            relations: ['roleGroup'],
+          });
           req['user'] = user;
         }
       }

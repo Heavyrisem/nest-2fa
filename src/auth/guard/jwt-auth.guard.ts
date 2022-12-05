@@ -1,7 +1,7 @@
 import { Request } from 'express';
 import { Observable } from 'rxjs';
 
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 
 import { User } from '~src/user/user.entity';
 
@@ -19,7 +19,9 @@ export class JwtAuthGuard implements CanActivate {
     const { authorization } = request.headers;
     if (authorization) {
       const [_, token] = authorization.split(' ');
-      return this.authService.verifyAccessToken(token) && user !== undefined;
+      const isValidToken = this.authService.verifyAccessToken(token);
+      if (!isValidToken) throw new UnauthorizedException('Token verify failed');
+      return user !== undefined;
     }
 
     return false;

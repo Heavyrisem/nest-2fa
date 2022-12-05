@@ -1,7 +1,7 @@
 import { hash, compare } from 'bcrypt';
 import { Exclude } from 'class-transformer';
 import { IsInstance, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { BeforeInsert, Column, Entity, OneToOne } from 'typeorm';
+import { BeforeInsert, Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 
 import { CoreEntity } from '~src/modules/database/core.entity';
 import { RoleGroup } from '~src/role/entity/role-group.entity';
@@ -36,6 +36,7 @@ export class User extends CoreEntity {
   @IsOptional()
   @IsInstance(RoleGroup)
   @OneToOne(() => RoleGroup, (roleGroup) => roleGroup.id)
+  @JoinColumn()
   roleGroup?: RoleGroup;
 
   @BeforeInsert()
