@@ -17,13 +17,11 @@ export class RoleGuard implements CanActivate {
     const user: User | undefined = request.user;
     if (!user) return false;
 
-    const roles = this.reflector.get<Roles[]>(ROLE_KEY, context.getHandler());
-    const { roleGroup } = user;
-    if (roles === undefined) return true;
-    if (roleGroup === undefined || roles === undefined) return false;
+    const requiredRoles = this.reflector.get<Roles[]>(ROLE_KEY, context.getHandler());
+    const userRoles = user.roleGroup.roles.map((item) => item.name);
+    if (requiredRoles === undefined) return true;
+    if (userRoles === undefined || requiredRoles === undefined) return false;
 
-    const filteredRoles = roleGroup.roles.filter((role) => roles.includes(role.name));
-    if (filteredRoles.length !== roles.length) return false;
-    return true;
+    return requiredRoles.every((role) => userRoles.includes(role));
   }
 }

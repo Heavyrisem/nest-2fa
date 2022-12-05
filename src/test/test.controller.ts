@@ -17,6 +17,7 @@ export class TestController {
 
   @Post('/')
   @UseGuards(JwtAuthGuard)
+  @Role(Roles.TEST_ROLE, Roles.MANAGE_USER)
   @UseGuards(RoleGuard)
   getHello(@GetUser() user: User) {
     console.log(user);
