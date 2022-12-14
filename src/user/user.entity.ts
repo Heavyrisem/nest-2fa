@@ -21,12 +21,14 @@ export class User extends CoreEntity {
   @Column()
   password: string;
 
+  @Exclude()
   @IsOptional()
   @IsNotEmpty()
   @IsString()
   @Column({ nullable: true })
   twoFactorSecret?: string;
 
+  @Exclude()
   @IsOptional()
   @IsNotEmpty()
   @IsString()

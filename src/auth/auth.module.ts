@@ -6,6 +6,8 @@ import { DatabaseModule } from '~modules/database/database.module';
 import { LoggerService } from '~modules/logging/logger.service';
 import { TotpModule } from '~modules/totp/totp.module';
 import { User } from '~src/user/user.entity';
+import { UserModule } from '~src/user/user.module';
+import { UserService } from '~src/user/user.service';
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';

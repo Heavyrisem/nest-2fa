@@ -19,10 +19,12 @@ export class JwtAuthGuard implements CanActivate {
     if (authorization) {
       const [_, token] = authorization.split(' ');
       const isValidToken = this.authService.verifyAccessToken(token);
-      if (!isValidToken) throw new UnauthorizedException('Token verify failed');
+      // console.log(user, isValidToken, token);
+      if (!isValidToken) throw new UnauthorizedException('TokenExpired');
       return user !== undefined;
     }
 
-    return false;
+    console.log('UnAuthorized no token provided');
+    throw new UnauthorizedException('NoTokenProvided');
   }
 }

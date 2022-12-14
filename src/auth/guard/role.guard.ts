@@ -18,7 +18,7 @@ export class RoleGuard implements CanActivate {
     if (!user) return false;
 
     const requiredRoles = this.reflector.get<Roles[]>(ROLE_KEY, context.getHandler());
-    const userRoles = user.roleGroup.roles.map((item) => item.name);
+    const userRoles = user.roleGroup?.roles.map((item) => item.name);
     if (requiredRoles === undefined) return true;
     if (userRoles === undefined || requiredRoles === undefined) return false;
 

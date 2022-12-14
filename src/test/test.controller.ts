@@ -16,11 +16,11 @@ export class TestController {
   constructor(private readonly testService: TestService) {}
 
   @Post('/')
-  @UseGuards(JwtAuthGuard)
   @Role(Roles.TEST_ROLE, Roles.MANAGE_USER)
   @UseGuards(RoleGuard)
+  @UseGuards(JwtAuthGuard)
   getHello(@GetUser() user: User) {
-    console.log(user);
+    // console.log(user);
     return this.testService.getHello();
   }
 

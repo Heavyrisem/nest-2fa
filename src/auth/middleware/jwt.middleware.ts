@@ -13,8 +13,7 @@ export class JwtMiddleware implements NestMiddleware {
 
   async use(req: Request, res: Response, next: NextFunction) {
     try {
-      const accessToken = req.headers.authorization?.replace('Bearer ', '') || null;
-
+      const [_, accessToken] = req.headers.authorization?.split(' ') || [];
       if (accessToken) {
         const accessPayload = this.jwtService.decode(accessToken) as JwtAuthPayload;
 
@@ -23,6 +22,7 @@ export class JwtMiddleware implements NestMiddleware {
             relations: ['roleGroup'],
           });
           req['user'] = user;
+          req['payload'] = accessPayload;
         }
       }
 

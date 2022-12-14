@@ -1,6 +1,7 @@
 import { Repository } from 'typeorm';
 
 import {
+  ConflictException,
   HttpException,
   Injectable,
   NotFoundException,
@@ -18,6 +19,7 @@ import { User } from '~src/user/user.entity';
 import { TwoFactorLoginDto } from './dto/2fa-login.dto';
 import { LoggerService } from '~modules/logging/logger.service';
 import { Response } from 'express';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -29,21 +31,37 @@ export class AuthService {
     private readonly loggerService: LoggerService,
   ) {}
 
+  async register({
+    email,
+    password,
+    name,
+  }: CreateUserDto): Promise<{ accessToken: string; refreshToken: string }> {
+    const exists = await this.findUser({ email });
+    if (exists) throw new ConflictException('Account Already Exists');
+
+    // const role = await this.userRoleRepository.find({
+    //   where: roles.map((roleName) => ({ name: roleName })),
+    // });
+    // TODO: transaction 추가
+    const user = this.userRepository.create({ email, password, name });
+    await this.userRepository.save(user);
+
+    const payload = this.generatePayload(user);
+
+    const accessToken = this.generateAccessToken(payload);
+    const refreshToken = await this.generateRefreshToken(payload);
+    return { accessToken, refreshToken };
+  }
+
   async login({
     email,
     password,
   }: LoginDto): Promise<{ accessToken: string; refreshToken: string }> {
-    const user = await this.userRepository.findOne({ where: { email } });
+    const user = await this.findUser({ email });
     if (!user) throw new NotFoundException('User Not Found');
     if (!(await user.checkPassword(password))) throw new UnauthorizedException('Password is Wrong');
 
-    const payload: JwtAuthPayload = {
-      id: user.id,
-      twoFactorAuthenticated: true,
-      //   email: user.email,
-      //   name: user.name,
-      //   role: user.role.map((r) => ({ name: r.name, description: r.description })),
-    };
+    const payload = this.generatePayload(user);
 
     const accessToken = this.generateAccessToken(payload);
     const refreshToken = await this.generateRefreshToken(payload);
@@ -52,7 +70,7 @@ export class AuthService {
   }
 
   async generateTwoFactorSecretForUser(userId: number) {
-    const user = await this.userRepository.findOne({ where: { id: userId } });
+    const user = await this.findUser({ id: userId });
     if (!user) throw new NotFoundException('User Not Found');
 
     if (user.twoFactorSecret) throw new HttpException('Resource Locked', 423);
@@ -67,16 +85,16 @@ export class AuthService {
     userId: number,
     { twoFactorCode: userTwoFactorCode }: TwoFactorLoginDto,
   ) {
-    const user = await this.userRepository.findOne({ where: { id: userId } });
+    const user = await this.findUser({ id: userId });
     if (!user) throw new NotFoundException('User Not Found');
     if (!user.twoFactorSecret) throw new NotFoundException('OTP is not registered');
 
     const serverTwoFactorCode = this.totpService.getCode(user.twoFactorSecret);
-    this.loggerService.debug(`GeneratedCode ${serverTwoFactorCode}`);
+    this.loggerService.log(`GeneratedCode ${serverTwoFactorCode}`);
     if (serverTwoFactorCode !== userTwoFactorCode)
       throw new UnauthorizedException('2FA authentication failed');
 
-    const payload: JwtAuthPayload = { id: user.id, twoFactorAuthenticated: true };
+    const payload = this.generatePayload(user, { twoFactorAuthenticated: true });
 
     const accessToken = this.generateAccessToken(payload);
     const refreshToken = await this.generateRefreshToken(payload);
@@ -92,16 +110,20 @@ export class AuthService {
       return false;
     }
   }
-  verifyRefreshToken(token: string) {
+  async verifyRefreshToken(userId: number, token: string) {
     try {
       this.jwtService.verify(token, { secret: this.configService.get('JWT_REFRESH_SECRET') });
-      return true;
+      const user = await this.findUser({ id: userId });
+      return user?.refreshToken === token;
     } catch (err) {
       return false;
     }
   }
 
   generateAccessToken(payload: JwtAuthPayload) {
+    delete payload.exp;
+    delete payload.iat;
+
     return this.jwtService.sign(payload, {
       secret: this.configService.get('JWT_ACCESS_SECRET'),
       expiresIn: this.configService.get('JWT_ACCESS_EXPIRES') / 1000,
@@ -109,6 +131,9 @@ export class AuthService {
   }
 
   async generateRefreshToken(payload: JwtAuthPayload) {
+    delete payload.exp;
+    delete payload.iat;
+
     const refreshToken = this.jwtService.sign(payload, {
       secret: this.configService.get('JWT_REFRESH_SECRET'),
       expiresIn: this.configService.get('JWT_REFRESH_EXPIRES') / 1000,
@@ -120,7 +145,20 @@ export class AuthService {
   setRefreshCookie(res: Response, refreshToken: string) {
     res.cookie('refreshToken', `Bearer ${refreshToken}`, {
       httpOnly: true,
-      maxAge: this.configService.get('JWT_COOKIE_EXPIRES'),
+      // maxAge: this.configService.get('JWT_COOKIE_EXPIRES'),
     });
+  }
+
+  generatePayload(user: User, override?: Partial<JwtAuthPayload>): JwtAuthPayload {
+    return {
+      id: user.id,
+      twoFactorAuthenticated: false,
+      roles: user.roleGroup?.roles.map((role) => role.name) || null,
+      ...override,
+    };
+  }
+
+  private async findUser(filter: Partial<Pick<User, 'id' | 'email' | 'name'>>) {
+    return this.userRepository.findOne({ where: { ...filter }, relations: ['roleGroup'] });
   }
 }
