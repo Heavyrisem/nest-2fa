@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsNumberString, Length } from 'class-validator';
 
 export class TwoFactorLoginDto {
@@ -7,5 +8,6 @@ export class TwoFactorLoginDto {
 
   @IsNumberString()
   @Length(6, 6)
+  @ApiProperty({ description: '2FA 인증 코드', minLength: 6, maxLength: 6 })
   twoFactorCode: string;
 }

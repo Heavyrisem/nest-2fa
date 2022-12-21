@@ -285,6 +285,7 @@ export class JwtMiddleware implements NestMiddleware {
             relations: [&#x27;roleGroup&#x27;],
           });
           req[&#x27;user&#x27;] &#x3D; user;
+          req[&#x27;payload&#x27;] &#x3D; accessPayload;
         }
       }
 

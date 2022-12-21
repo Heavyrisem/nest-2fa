@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { hash, compare } from 'bcrypt';
 import { Exclude } from 'class-transformer';
 import { IsInstance, IsNotEmpty, IsOptional, IsString } from 'class-validator';
@@ -10,10 +11,12 @@ import { RoleGroup } from '~src/role/entity/role-group.entity';
 export class User extends CoreEntity {
   @IsString()
   @Column()
+  @ApiProperty({ description: '사용자 이메일' })
   email: string;
 
   @IsString()
   @Column()
+  @ApiProperty({ description: '사용자 이름' })
   name: string;
 
   @Exclude({ toPlainOnly: true })
@@ -39,6 +42,7 @@ export class User extends CoreEntity {
   @IsInstance(RoleGroup)
   @OneToOne(() => RoleGroup, (roleGroup) => roleGroup.id)
   @JoinColumn()
+  @ApiProperty({ description: '권한 그룹' })
   roleGroup?: RoleGroup;
 
   @BeforeInsert()

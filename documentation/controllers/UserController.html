@@ -116,7 +116,7 @@
             </tr>
             <tr>
                 <td class="col-md-4">
-<code>getCurrentUser(user: <a href="../entitys/User.html" target="_self">User</a>)</code>
+<code>getCurrentUser(user: <a href="../entitys/User.html" target="_self">User</a>, payload: <a href="../interfaces/JwtAuthPayload.html" target="_self">JwtAuthPayload</a>)</code>
                 </td>
             </tr>
 
@@ -130,8 +130,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="18"
-                            class="link-to-prism">src/user/user.controller.ts:18</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="20"
+                            class="link-to-prism">src/user/user.controller.ts:20</a></div>
                 </td>
             </tr>
 
@@ -163,13 +163,25 @@
 
 
                                 </tr>
+                                <tr>
+                                    <td>payload</td>
+                                    <td>
+                                                <code><a href="../interfaces/JwtAuthPayload.html" target="_self" >JwtAuthPayload</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
                             </tbody>
                         </table>
                     </div>
                     <div>
                     </div>
                     <div class="io-description">
-                        <b>Returns : </b>        <code><a href="../entitys/User.html" target="_self" >{ result: User; }</a></code>
+                        <b>Returns : </b>    <code>{ result: any; }</code>
 
                     </div>
                     <div class="io-description">
@@ -184,6 +196,8 @@
 
     <div class="tab-pane fade  tab-source-code" id="c-source">
         <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Body, Controller, Get, Post, UseGuards } from &#x27;@nestjs/common&#x27;;
+import { JwtAuthPayload } from &#x27;~src/auth/auth.interface&#x27;;
+import { JwtPayload } from &#x27;~src/auth/decorator/jwt.decorator&#x27;;
 import { GetUser } from &#x27;~src/auth/decorator/user.decorator&#x27;;
 import { JwtAuthGuard } from &#x27;~src/auth/guard/jwt-auth.guard&#x27;;
 
@@ -200,8 +214,11 @@ export class UserController {
 
   @Get(&#x27;/me&#x27;)
   @UseGuards(JwtAuthGuard)
-  getCurrentUser(@GetUser() user: User) {
-    return { result: user };
+  getCurrentUser(@GetUser() user: User, @JwtPayload() payload: JwtAuthPayload) {
+    const result: User &amp; { twoFactorAuthenticated?: boolean } &#x3D; user;
+    result.twoFactorAuthenticated &#x3D; payload.twoFactorAuthenticated;
+
+    return { result };
   }
 
   //   @Post(&#x27;/role/create&#x27;)

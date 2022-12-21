@@ -145,7 +145,6 @@ export class AuthService {
   setRefreshCookie(res: Response, refreshToken: string) {
     res.cookie('refreshToken', `Bearer ${refreshToken}`, {
       httpOnly: true,
-      // maxAge: this.configService.get('JWT_COOKIE_EXPIRES'),
     });
   }
 

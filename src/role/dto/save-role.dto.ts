@@ -1,10 +1,4 @@
-import { IsEnum, IsString } from 'class-validator';
-import { Roles } from '../entity/role.entity';
+import { PickType } from '@nestjs/mapped-types';
+import { Role } from '../entity/role.entity';
 
-export class SaveRoleDto {
-  @IsEnum(Roles)
-  name: Roles;
-
-  @IsString()
-  description: string;
-}
+export class SaveRoleDto extends PickType(Role, ['name', 'description']) {}

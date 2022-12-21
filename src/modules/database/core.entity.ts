@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsDate, IsNumber, IsOptional, validateOrReject } from 'class-validator';
 import {
   BeforeInsert,

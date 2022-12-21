@@ -11,7 +11,6 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 
 import { TotpService } from '~modules/totp/totp.service';
 import { LoginDto } from '~src/auth/dto/login.dto';
@@ -25,19 +24,24 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtAuthPayload } from './auth.interface';
 import { LoggerService } from '~modules/logging/logger.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UserService } from '~src/user/user.service';
+import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('인증')
 @Controller('/auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly totpService: TotpService,
-    private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
     private readonly loggerService: LoggerService,
   ) {}
 
   @Get('/2fa')
+  @ApiOperation({
+    summary: '2FA QR Image',
+    description: '2FA 인증기 등록을 위한 QR 이미지를 가져옵니다. (회원가입 이후 최초 1회만 가능)',
+  })
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Header('Content-Type', 'image/png')
   async generateTwoFactorCode(@Res() res: Response, @GetUser() user: User) {
@@ -47,6 +51,7 @@ export class AuthController {
   }
 
   @Post('/register')
+  @ApiOperation({ summary: '회원가입' })
   async createUser(@Res() res: Response, @Body() createUserDto: CreateUserDto) {
     const { accessToken, refreshToken } = await this.authService.register(createUserDto);
 
@@ -55,6 +60,7 @@ export class AuthController {
   }
 
   @Post('/login')
+  @ApiOperation({ summary: '로그인', description: '이메일, 패스워드 기반 로그인' })
   async login(@Res() res: Response, @Body() loginDto: LoginDto) {
     const { accessToken, refreshToken } = await this.authService.login(loginDto);
     this.authService.setRefreshCookie(res, refreshToken);
@@ -63,6 +69,8 @@ export class AuthController {
   }
 
   @Post('/login/2fa')
+  @ApiOperation({ summary: '2FA 로그인', description: '2FA 코드로 로그인을 진행합니다.' })
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   async verifyTwoFactor(
     @Res() res: Response,
@@ -79,6 +87,11 @@ export class AuthController {
   }
 
   @Post('/re-issue')
+  @ApiOperation({
+    summary: '토큰 재발급',
+    description: '만료된 AccessToken을 RefreshToken으로 새로 발급합니다.',
+  })
+  @ApiBearerAuth()
   async reIssueToken(@Req() req: Request, @Res() res: Response, @GetUser() user: User) {
     const accessToken = req.headers.authorization?.replace('Bearer ', '') || null;
     const refreshToken = req.cookies['refreshToken']?.replace('Bearer ', '') || null;

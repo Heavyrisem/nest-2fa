@@ -256,8 +256,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="161"
-                            class="link-to-prism">src/auth/auth.service.ts:161</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="160"
+                            class="link-to-prism">src/auth/auth.service.ts:160</a></div>
                 </td>
             </tr>
 
@@ -394,8 +394,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="152"
-                            class="link-to-prism">src/auth/auth.service.ts:152</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="151"
+                            class="link-to-prism">src/auth/auth.service.ts:151</a></div>
                 </td>
             </tr>
 
@@ -1205,7 +1205,6 @@ export class AuthService {
   setRefreshCookie(res: Response, refreshToken: string) {
     res.cookie(&#x27;refreshToken&#x27;, &#x60;Bearer ${refreshToken}&#x60;, {
       httpOnly: true,
-      // maxAge: this.configService.get(&#x27;JWT_COOKIE_EXPIRES&#x27;),
     });
   }
 

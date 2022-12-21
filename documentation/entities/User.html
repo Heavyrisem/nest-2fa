@@ -241,13 +241,13 @@
                         <b>Decorators : </b>
                         <br />
                         <code>
-                            @IsOptional()<br />@IsNotEmpty()<br />@IsString()<br />@Column({nullable: true})<br />
+                            @Exclude()<br />@IsOptional()<br />@IsNotEmpty()<br />@IsString()<br />@Column({nullable: true})<br />
                         </code>
                     </td>
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="34" class="link-to-prism">src/user/user.entity.ts:34</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="36" class="link-to-prism">src/user/user.entity.ts:36</a></div>
                         </td>
                     </tr>
 
@@ -283,7 +283,7 @@
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="40" class="link-to-prism">src/user/user.entity.ts:40</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="42" class="link-to-prism">src/user/user.entity.ts:42</a></div>
                         </td>
                     </tr>
 
@@ -313,13 +313,13 @@
                         <b>Decorators : </b>
                         <br />
                         <code>
-                            @IsOptional()<br />@IsNotEmpty()<br />@IsString()<br />@Column({nullable: true})<br />
+                            @Exclude()<br />@IsOptional()<br />@IsNotEmpty()<br />@IsString()<br />@Column({nullable: true})<br />
                         </code>
                     </td>
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="28" class="link-to-prism">src/user/user.entity.ts:28</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="29" class="link-to-prism">src/user/user.entity.ts:29</a></div>
                         </td>
                     </tr>
 
@@ -354,12 +354,14 @@ export class User extends CoreEntity {
   @Column()
   password: string;
 
+  @Exclude()
   @IsOptional()
   @IsNotEmpty()
   @IsString()
   @Column({ nullable: true })
   twoFactorSecret?: string;
 
+  @Exclude()
   @IsOptional()
   @IsNotEmpty()
   @IsString()

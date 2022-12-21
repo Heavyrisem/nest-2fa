@@ -1,13 +1,6 @@
+import { PickType } from '@nestjs/mapped-types';
 import { IsInstance, IsNumber, IsString } from 'class-validator';
+import { RoleGroup } from '../entity/role-group.entity';
 import { Role } from '../entity/role.entity';
 
-export class SaveRoleGroupDto {
-  @IsString()
-  name: string;
-
-  @IsString()
-  description: string;
-
-  @IsInstance(Role)
-  roles: Role[];
-}
+export class SaveRoleGroupDto extends PickType(RoleGroup, ['name', 'description', 'roles']) {}

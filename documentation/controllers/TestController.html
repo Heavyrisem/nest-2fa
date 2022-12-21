@@ -127,7 +127,7 @@
                 <td class="col-md-4">
                     <b>Decorators : </b>
                     <br />
-                    <code>@Post(&#x27;/&#x27;)<br />@UseGuards(JwtAuthGuard)<br />@Role(Roles.TEST_ROLE, Roles.MANAGE_USER)<br />@UseGuards(RoleGuard)<br /></code>
+                    <code>@Post(&#x27;/&#x27;)<br />@Role(Roles.TEST_ROLE)<br />@UseGuards(RoleGuard)<br />@UseGuards(JwtAuthGuard)<br /></code>
                 </td>
             </tr>
 
@@ -280,9 +280,9 @@ export class TestController {
   constructor(private readonly testService: TestService) {}
 
   @Post(&#x27;/&#x27;)
-  @UseGuards(JwtAuthGuard)
-  @Role(Roles.TEST_ROLE, Roles.MANAGE_USER)
+  @Role(Roles.TEST_ROLE)
   @UseGuards(RoleGuard)
+  @UseGuards(JwtAuthGuard)
   getHello(@GetUser() user: User) {
     // console.log(user);
     return this.testService.getHello();

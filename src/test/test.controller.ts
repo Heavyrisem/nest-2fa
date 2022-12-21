@@ -16,10 +16,10 @@ export class TestController {
   constructor(private readonly testService: TestService) {}
 
   @Post('/')
-  @Role(Roles.TEST_ROLE, Roles.MANAGE_USER)
+  @Role(Roles.TEST_ROLE, Roles.TEST_ROLE, Roles.TEST_ROLE, Roles.TEST_ROLE)
   @UseGuards(RoleGuard)
   @UseGuards(JwtAuthGuard)
-  getHello(@GetUser() user: User) {
+  postHello(@GetUser() user: User) {
     // console.log(user);
     return this.testService.getHello();
   }
@@ -28,6 +28,11 @@ export class TestController {
   @UseGuards(TwoFactorAuthGuard)
   twoFactorTest(@GetUser() user: User) {
     console.log(user);
+    return this.testService.getHello();
+  }
+
+  @Get('/')
+  getHello() {
     return this.testService.getHello();
   }
 }
